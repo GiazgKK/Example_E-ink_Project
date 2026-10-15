@@ -67,37 +67,36 @@ Firmware hiện tại nạp `include/image_data.h` và cần **hai plane bitmap 
 
 Với cấu hình WFT hiện tại, mỗi plane dài 15.000 byte. Định dạng do converter của dự án tạo ra lưu pixel theo hàng, bit quan trọng nhất trước và bit `1` biểu thị có mực. Pixel trắng không được bật ở cả hai plane; pixel đen và đỏ không chồng lên nhau. Driver áp dụng cực tính bit và hướng ảnh khi ghi bitmap ra panel.
 
-Công cụ chuyển ảnh của dự án được lưu riêng dưới tên `epd_image_converter.py` cùng `requirements-epd.txt`, không nằm trong repository này. Hãy lấy các file đó từ chủ dự án. Mở PowerShell tại thư mục chứa converter, cài dependency và chuyển ảnh; chỉ định rõ vị trí header đầu ra:
+Converter và bộ kiểm thử hiện có trong thư mục [`tool/`](tool/). Mở PowerShell tại thư mục gốc repository, cài dependency rồi chạy converter. Mặc định header và hai PNG preview sẽ được tạo trong `include/`:
 
 ```powershell
-python -m pip install -r requirements-epd.txt
-python epd_image_converter.py "C:\duong-dan\photo.jpg" `
-  --fit contain --red-mode strict `
-  -o "C:\duong-dan\Example_Display_Image\include\image_data.h"
+python -m pip install -r tool\requirements-epd.txt
+python tool\epd_image_converter.py "C:\duong-dan\photo.jpg" `
+  --fit contain --red-mode strict
 ```
 
-Converter tạo thêm PNG ảnh đã chuẩn bị và PNG xem trước cạnh header đầu ra. Hãy kiểm tra các ảnh này trước khi nạp firmware. `--fit contain` giữ toàn bộ ảnh và thêm viền trắng khi cần; `--fit crop` lấp đầy màn nhưng có thể cắt mất mép; `--fit stretch` làm thay đổi tỷ lệ ảnh. Có thể xoay ảnh đầu vào trước khi chuyển bằng `--rotate cw`, `--rotate ccw` hoặc `--rotate 180`.
+Có thể truyền `-o "C:\duong-dan\image_data.h"` để chọn vị trí header khác. Converter tạo thêm PNG ảnh đã chuẩn bị và PNG xem trước cạnh header đầu ra. Hãy kiểm tra các ảnh này trước khi nạp firmware. `--fit contain` giữ toàn bộ ảnh và thêm viền trắng khi cần; `--fit crop` lấp đầy màn nhưng có thể cắt mất mép; `--fit stretch` làm thay đổi tỷ lệ ảnh. Có thể xoay ảnh đầu vào trước khi chuyển bằng `--rotate cw`, `--rotate ccw` hoặc `--rotate 180`.
 
 Một số tùy chọn hữu ích cho converter 4.2 inch hiện tại:
 
 ```powershell
 # Tạo ảnh mẫu kiểm tra
-python epd_image_converter.py --demo
+python tool\epd_image_converter.py --demo
 
 # Giữ sắc đỏ và viền khử răng cưa cho tranh/đồ họa
-python epd_image_converter.py "C:\duong-dan\artwork.jpg" `
+python tool\epd_image_converter.py "C:\duong-dan\artwork.jpg" `
   --fit contain --red-mode artwork --no-auto
 
 # Ưu tiên chi tiết đen-trắng cho ảnh chụp
-python epd_image_converter.py "C:\duong-dan\photo.jpg" `
+python tool\epd_image_converter.py "C:\duong-dan\photo.jpg" `
   --fit contain --red-mode off
 
 # Tinh chỉnh độ sáng, ngưỡng đen hoặc nhận diện màu đỏ
-python epd_image_converter.py "C:\duong-dan\photo.jpg" `
+python tool\epd_image_converter.py "C:\duong-dan\photo.jpg" `
   --brightness 1.15 --black-threshold 180 --red-min 100 --red-margin 40
 
-# Chạy kiểm thử converter trong thư mục chứa công cụ
-python -m unittest test_epd_image_converter.py
+# Chạy kiểm thử converter
+python -m unittest discover -s tool -p "test_epd_image_converter.py"
 ```
 
 Converter hiện cố định ở 400 × 300. **Không dùng trực tiếp ảnh do converter này tạo cho màn 2.9 inch hoặc 2.13 inch.** Các màn nhỏ cần converter được cấu hình theo đúng độ phân giải, số plane và cách đóng gói bitmap của driver; hãy cập nhật và kiểm thử luồng chuyển đổi trước khi sử dụng.
