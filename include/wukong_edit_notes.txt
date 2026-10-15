@@ -1,0 +1,8 @@
+Edited using the built-in image_gen tool from image_data_preview.png.
+Prompt: Preserve Wukong's pose, face, hair, armor and landscape composition.
+Replace the background behind the character with solid white. Recolor Chinese
+calligraphy and BLACK MYTH WUKONG lettering red. Keep the character monochrome
+with detailed stipple texture; remove red marks on the face. Add no objects.
+Conversion: epd_image_converter.py wukong_white_background_source.png
+            --fit stretch --no-auto --red-mode strict
+Original header and preview are saved as image_data_before_white_background.*
